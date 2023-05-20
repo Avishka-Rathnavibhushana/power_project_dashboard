@@ -17,6 +17,7 @@ dependencies:
   flutter_svg: ^2.0.5
   get: ^4.6.5
   percent_indicator: ^4.2.3
+  fl_chart: ^0.62.0
 
 dev_dependencies:
   flutter_test:

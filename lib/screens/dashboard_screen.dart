@@ -41,12 +41,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           // ),
           Expanded(
             flex: 9,
-            child: Column(
-              children: [
-                HomeScreen(
-                  data: controller.selectedHomeData.value,
-                ),
-              ],
+            child: HomeScreen(
+              data: controller.selectedHomeData.value,
             ),
           ),
         ],
