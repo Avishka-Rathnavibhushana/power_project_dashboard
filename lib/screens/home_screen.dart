@@ -1,15 +1,34 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:power_project_dashboard/controllers/main_controller.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomeData {
+  String? title;
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  HomeData({
+    this.title,
+  });
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class HomeScreen extends StatelessWidget {
+  HomeData data;
+
+  HomeScreen({super.key, required this.data});
+
+  MainController controller = Get.find();
+
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Obx(
+      () => controller.loading.value
+          ? SizedBox(
+              width: 30,
+              height: 30,
+              child: CircularProgressIndicator(),
+            )
+          : Container(
+              child: Text(data.title!),
+            ),
+    );
   }
 }
