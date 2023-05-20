@@ -14,11 +14,13 @@ class MainController extends GetxController {
 
   var touchedIndex = -1.obs;
 
-  void onHomeCardPress(int index, String label) {
+  Future<void> onHomeCardPress(int index, String label) async {
     selectedHome.value = index;
     selectedHomeData.value.title = label;
     generatePast7Days();
     getDevicesList();
+
+    await Future.delayed(Duration(seconds: 3));
   }
 
   List<String> monthList = [
@@ -138,7 +140,6 @@ class MainController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    generatePast7Days();
-    getDevicesList();
+    onHomeCardPress(0, "Home 1");
   }
 }

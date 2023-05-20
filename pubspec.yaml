@@ -18,6 +18,7 @@ dependencies:
   get: ^4.6.5
   percent_indicator: ^4.2.3
   fl_chart: ^0.62.0
+  loading_animation_widget: ^1.2.0+4
 
 dev_dependencies:
   flutter_test:

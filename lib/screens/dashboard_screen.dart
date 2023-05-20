@@ -41,8 +41,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
           // ),
           Expanded(
             flex: 9,
-            child: HomeScreen(
-              data: controller.selectedHomeData.value,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                HomeScreen(
+                  data: controller.selectedHomeData.value,
+                ),
+              ],
             ),
           ),
         ],

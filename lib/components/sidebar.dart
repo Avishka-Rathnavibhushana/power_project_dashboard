@@ -82,9 +82,8 @@ class Sidebar extends StatelessWidget {
 
                   print("index : $index | label : ${value.label}");
 
-                  controller.onHomeCardPress(index, value.label);
+                  await controller.onHomeCardPress(index, value.label);
 
-                  await Future.delayed(Duration(seconds: 2));
                   controller.loading.value = false;
                 },
               ),

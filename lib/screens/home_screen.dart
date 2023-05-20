@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:power_project_dashboard/app_constants.dart';
 import 'package:power_project_dashboard/components/text_field_two.dart';
 import 'package:power_project_dashboard/controllers/main_controller.dart';
@@ -54,9 +55,12 @@ class HomeScreen extends StatelessWidget {
     return Obx(
       () => controller.loading.value
           ? SizedBox(
-              width: 30,
-              height: 30,
-              child: CircularProgressIndicator(),
+              width: 100,
+              height: 100,
+              child: LoadingAnimationWidget.staggeredDotsWave(
+                color: Color(0xFF2196F3),
+                size: 100,
+              ),
             )
           : Container(
               height: MediaQuery.of(context).size.height,
