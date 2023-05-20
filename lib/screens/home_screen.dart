@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:power_project_dashboard/app_constants.dart';
+import 'package:power_project_dashboard/components/indicator.dart';
 import 'package:power_project_dashboard/components/text_field_two.dart';
 import 'package:power_project_dashboard/controllers/main_controller.dart';
 
@@ -36,15 +37,6 @@ class HomeScreen extends StatelessWidget {
   HomeScreen({super.key, required this.data});
 
   MainController controller = Get.find();
-
-  List<Color> get availableColors => const <Color>[
-        Color(0xFF6E1BFF),
-        Color(0xFFFFC300),
-        Color(0xFF2196F3),
-        Color(0xFFFF683B),
-        Color(0xFFFF3AF2),
-        Color(0xFFE80054),
-      ];
 
   final Color barBackgroundColor = Colors.white.withOpacity(0.3);
   final Color barColor = Colors.white;
@@ -180,46 +172,112 @@ class HomeScreen extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            GestureDetector(
-                              onTap: () {
-                                controller.test();
-                              },
-                              child: Container(
-                                width: 400,
-                                height: 400,
-                                decoration: BoxDecoration(
+                            Container(
+                              width: 400,
+                              decoration: BoxDecoration(
+                                color: Color(0xFFE80054).withOpacity(0.1),
+                                border: Border.all(
                                   color: Color(0xFFE80054).withOpacity(0.1),
-                                  border: Border.all(
-                                    color: Color(0xFFE80054).withOpacity(0.1),
-                                    width: 1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: <BoxShadow>[
-                                    BoxShadow(
-                                      color: Color(0xFFE80054).withOpacity(0.5),
-                                      blurRadius: 10,
-                                      spreadRadius: 0.3,
-                                      blurStyle: BlurStyle.outer,
-                                    ),
-                                  ],
+                                  width: 1,
                                 ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 15, horizontal: 10),
-                                      child: Text(
-                                        "Total Power",
-                                        style: TextStyle(
-                                          color: Colors.black38,
-                                          fontSize: 25,
-                                          fontWeight: FontWeight.bold,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: <BoxShadow>[
+                                  BoxShadow(
+                                    color: Color(0xFFE80054).withOpacity(0.5),
+                                    blurRadius: 10,
+                                    spreadRadius: 0.3,
+                                    blurStyle: BlurStyle.outer,
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 15, horizontal: 10),
+                                    child: Text(
+                                      "Total Power",
+                                      style: TextStyle(
+                                        color: Colors.black38,
+                                        fontSize: 25,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 15, horizontal: 10),
+                                    child: Container(
+                                      width: 300,
+                                      height: 200,
+                                      child: PieChart(
+                                        PieChartData(
+                                          pieTouchData: PieTouchData(
+                                            touchCallback: (FlTouchEvent event,
+                                                pieTouchResponse) {
+                                              if (!event
+                                                      .isInterestedForInteractions ||
+                                                  pieTouchResponse == null ||
+                                                  pieTouchResponse
+                                                          .touchedSection ==
+                                                      null) {
+                                                controller.touchedIndexPie = -1;
+                                                return;
+                                              }
+                                              controller.touchedIndexPie =
+                                                  pieTouchResponse
+                                                      .touchedSection!
+                                                      .touchedSectionIndex;
+                                            },
+                                          ),
+                                          borderData: FlBorderData(
+                                            show: false,
+                                          ),
+                                          sectionsSpace: 5,
+                                          centerSpaceRadius: 50,
+                                          sections: showingSections(),
                                         ),
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          bottom: 15, left: 10, right: 10),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: controller
+                                            .totalPowerDateList.value
+                                            .map(
+                                              (item) => Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 4),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  children: [
+                                                    Indicator(
+                                                      color: item["Color"],
+                                                      text: item["Device"] +
+                                                          ", " +
+                                                          item["Description"],
+                                                      isSquare: false,
+                                                      size: 16,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            )
+                                            .toList(),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -232,6 +290,10 @@ class HomeScreen extends StatelessWidget {
             ),
     );
   }
+
+  //
+  // Bar chart helpers
+  //
 
   BarChartGroupData makeGroupData(
     int x,
@@ -498,7 +560,50 @@ class HomeScreen extends StatelessWidget {
       child: text,
     );
   }
+
+  //
+  // Pie chart helpers
+  //
+
+  List<PieChartSectionData> showingSections() {
+    return List.generate(controller.totalPowerDateList.value.length, (i) {
+      final isTouched = i == controller.touchedIndex;
+      final fontSize = isTouched ? 13.0 : 10.0;
+      final radius = isTouched ? 60.0 : 50.0;
+      const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
+      bool returned = false;
+      var section = null;
+      for (var j = 0; j < controller.totalPowerDateList.value.length; j++) {
+        if (i == j) {
+          returned = true;
+          section = PieChartSectionData(
+            color: controller.totalPowerDateList.value[j]["Color"],
+            value: double.parse(controller
+                .totalPowerDateList.value[j]["Percentage"]
+                .toString()),
+            title: controller.totalPowerDateList.value[j]["Percentage"]
+                    .toString() +
+                '%',
+            radius: radius,
+            titleStyle: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.w400,
+              color: Colors.white,
+              shadows: shadows,
+            ),
+          );
+        }
+      }
+      if (!returned) {
+        throw Error();
+      } else {
+        return section;
+      }
+    });
+  }
 }
+
+// Helper widget to display devices data
 
 class DeviceBox extends StatelessWidget {
   const DeviceBox({
