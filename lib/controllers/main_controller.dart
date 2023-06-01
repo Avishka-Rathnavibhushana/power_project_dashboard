@@ -5,7 +5,7 @@ import 'package:power_project_dashboard/screens/home_screen.dart';
 
 class MainController extends GetxController {
   var selectedHome = 0.obs;
-  var selectedHomeData = HomeData(title: "Home 1").obs;
+  var selectedHomeData = HomeData(title: "Home 1", address: "Address 1").obs;
   var loading = false.obs;
 
   var itemList = [].obs;
@@ -17,10 +17,12 @@ class MainController extends GetxController {
 
   var touchedIndex = -1.obs;
   var touchedIndexPie = -1.obs;
+  var selectedDate = DateTime.now().obs;
 
   Future<void> onHomeCardPress(int index, String label) async {
     selectedHome.value = index;
     selectedHomeData.value.title = label;
+    selectedHomeData.value.address = "Address " + index.toString();
     generatePast7Days();
     getDevicesList();
     getTotalPowerDateList();
@@ -222,5 +224,9 @@ class MainController extends GetxController {
   void onInit() {
     super.onInit();
     onHomeCardPress(0, "Home 1");
+  }
+
+  void onSelectionChanged() {
+    // TODO: implement your code here
   }
 }

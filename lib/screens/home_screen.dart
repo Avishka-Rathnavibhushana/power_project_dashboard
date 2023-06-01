@@ -1,3 +1,4 @@
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,9 +10,11 @@ import 'package:power_project_dashboard/controllers/main_controller.dart';
 
 class HomeData {
   String? title;
+  String? address;
 
   HomeData({
     this.title,
+    this.address,
   });
 }
 
@@ -41,6 +44,17 @@ class HomeScreen extends StatelessWidget {
   final Color barBackgroundColor = Colors.white.withOpacity(0.3);
   final Color barColor = Colors.white;
   final Color touchedBarColor = Color(0xFF3BFF49);
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+        context: context,
+        initialDate: controller.selectedDate.value,
+        firstDate: DateTime(2015),
+        lastDate: DateTime(2050));
+    if (pickedDate != null && pickedDate != controller.selectedDate.value) {
+      controller.selectedDate.value = pickedDate;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,19 +103,138 @@ class HomeScreen extends StatelessWidget {
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 15, horizontal: 15),
-                                  child: Text(
-                                    data.title!,
-                                    style: TextStyle(
-                                      color: Colors.black38,
-                                      fontSize: 25,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        data.title!,
+                                        style: TextStyle(
+                                          color: Colors.black38,
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text(
+                                        data.address!,
+                                        style: TextStyle(
+                                          color: Colors.black54,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
                             ),
                           ),
                         ],
+                      ),
+
+                      // Container(
+                      //   width: 400,
+                      //   decoration: BoxDecoration(
+                      //     color: Color(0xFF03910F).withOpacity(0.1),
+                      //     border: Border.all(
+                      //       color: Color(0xFF03910F).withOpacity(0.1),
+                      //       width: 1,
+                      //     ),
+                      //     borderRadius: BorderRadius.circular(10),
+                      //     boxShadow: <BoxShadow>[
+                      //       BoxShadow(
+                      //         color: Color(0xFF03910F).withOpacity(0.5),
+                      //         blurRadius: 10,
+                      //         spreadRadius: 0.3,
+                      //         blurStyle: BlurStyle.outer,
+                      //       ),
+                      //     ],
+                      //   ),
+                      //   child: Obx(() {
+                      //     return CalendarDatePicker2(
+                      //       config: CalendarDatePicker2Config(
+                      //         calendarType: CalendarDatePicker2Type.multi,
+                      //       ),
+                      //       value: [controller.selectedDate.value],
+                      //       onValueChanged: (dates) {
+                      //         if (dates.length != 0) {
+                      //           DateTime date1 = dates[0]!;
+                      //           DateTime date2 = dates[dates.length - 1]!;
+                      //           var diff = date2.isAfter(date1);
+                      //           print(diff);
+                      //           if (diff) {}
+                      //         }
+
+                      //         controller.selectedDate.value =
+                      //             dates[dates.length - 1]!;
+                      //         print(dates);
+                      //         print(controller.selectedDate.value);
+                      //       },
+                      //     );
+                      //   }),
+                      // ),
+                      Material(
+                        color: Color(0xFF03910F).withOpacity(0.1),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Color(0xFF03910F).withOpacity(0.1),
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: <BoxShadow>[
+                              BoxShadow(
+                                color: Color(0xFF03910F).withOpacity(0.5),
+                                blurRadius: 10,
+                                spreadRadius: 0.3,
+                                blurStyle: BlurStyle.outer,
+                              ),
+                            ],
+                          ),
+                          child: InkWell(
+                            onTap: () {
+                              _selectDate(context);
+                            },
+                            borderRadius: BorderRadius.circular(10),
+                            child: Padding(
+                              padding: const EdgeInsets.all(kSpacing),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.calendar_month,
+                                    color: Colors.black,
+                                    size: 25,
+                                  ),
+                                  const SizedBox(width: kSpacing / 2),
+                                  Text(
+                                    "Select Date : " +
+                                        controller.selectedDate.value.year
+                                            .toString() +
+                                        " - " +
+                                        controller.selectedDate.value.month
+                                            .toString() +
+                                        " - " +
+                                        controller.selectedDate.value.day
+                                            .toString(),
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 25,
+                                    ),
+                                  ),
+                                  // if (data.totalNotif != null)
+                                  //   Padding(
+                                  //     padding: const EdgeInsets.only(left: kSpacing / 2),
+                                  //     child: _notif(data.totalNotif!),
+                                  //   )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(20),
@@ -123,55 +256,6 @@ class HomeScreen extends StatelessWidget {
                           runSpacing: 25,
                           spacing: 25,
                           children: [
-                            Container(
-                              width: 400,
-                              height: 400,
-                              decoration: BoxDecoration(
-                                color: Color(0xFF007E2A).withOpacity(0.1),
-                                border: Border.all(
-                                  color: Color(0xFF007E2A).withOpacity(0.1),
-                                  width: 1,
-                                ),
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: <BoxShadow>[
-                                  BoxShadow(
-                                    color: Color(0xFF007E2A).withOpacity(0.5),
-                                    blurRadius: 10,
-                                    spreadRadius: 0.3,
-                                    blurStyle: BlurStyle.outer,
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 15, horizontal: 10),
-                                    child: Text(
-                                      "Power Consumption History",
-                                      style: TextStyle(
-                                        color: Colors.black38,
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 15, horizontal: 10),
-                                    child: Container(
-                                      height: 300,
-                                      child: BarChart(
-                                        mainBarData(),
-                                        swapAnimationDuration:
-                                            Duration(milliseconds: 250),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
                             Container(
                               width: 400,
                               decoration: BoxDecoration(
@@ -274,6 +358,55 @@ class HomeScreen extends StatelessWidget {
                                               ),
                                             )
                                             .toList(),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              width: 400,
+                              height: 400,
+                              decoration: BoxDecoration(
+                                color: Color(0xFF007E2A).withOpacity(0.1),
+                                border: Border.all(
+                                  color: Color(0xFF007E2A).withOpacity(0.1),
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: <BoxShadow>[
+                                  BoxShadow(
+                                    color: Color(0xFF007E2A).withOpacity(0.5),
+                                    blurRadius: 10,
+                                    spreadRadius: 0.3,
+                                    blurStyle: BlurStyle.outer,
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 15, horizontal: 10),
+                                    child: Text(
+                                      "Power Consumption History",
+                                      style: TextStyle(
+                                        color: Colors.black38,
+                                        fontSize: 25,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 15, horizontal: 10),
+                                    child: Container(
+                                      height: 300,
+                                      child: BarChart(
+                                        mainBarData(),
+                                        swapAnimationDuration:
+                                            Duration(milliseconds: 250),
                                       ),
                                     ),
                                   ),
