@@ -47,10 +47,11 @@ class HomeScreen extends StatelessWidget {
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
-        context: context,
-        initialDate: controller.selectedDate.value,
-        firstDate: DateTime(2015),
-        lastDate: DateTime(2050));
+      context: context,
+      initialDate: controller.selectedDate.value,
+      firstDate: DateTime(2015),
+      lastDate: DateTime.now(),
+    );
     if (pickedDate != null && pickedDate != controller.selectedDate.value) {
       controller.selectedDate.value = pickedDate;
     }
@@ -134,48 +135,6 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-
-                      // Container(
-                      //   width: 400,
-                      //   decoration: BoxDecoration(
-                      //     color: Color(0xFF03910F).withOpacity(0.1),
-                      //     border: Border.all(
-                      //       color: Color(0xFF03910F).withOpacity(0.1),
-                      //       width: 1,
-                      //     ),
-                      //     borderRadius: BorderRadius.circular(10),
-                      //     boxShadow: <BoxShadow>[
-                      //       BoxShadow(
-                      //         color: Color(0xFF03910F).withOpacity(0.5),
-                      //         blurRadius: 10,
-                      //         spreadRadius: 0.3,
-                      //         blurStyle: BlurStyle.outer,
-                      //       ),
-                      //     ],
-                      //   ),
-                      //   child: Obx(() {
-                      //     return CalendarDatePicker2(
-                      //       config: CalendarDatePicker2Config(
-                      //         calendarType: CalendarDatePicker2Type.multi,
-                      //       ),
-                      //       value: [controller.selectedDate.value],
-                      //       onValueChanged: (dates) {
-                      //         if (dates.length != 0) {
-                      //           DateTime date1 = dates[0]!;
-                      //           DateTime date2 = dates[dates.length - 1]!;
-                      //           var diff = date2.isAfter(date1);
-                      //           print(diff);
-                      //           if (diff) {}
-                      //         }
-
-                      //         controller.selectedDate.value =
-                      //             dates[dates.length - 1]!;
-                      //         print(dates);
-                      //         print(controller.selectedDate.value);
-                      //       },
-                      //     );
-                      //   }),
-                      // ),
                       Material(
                         color: Color(0xFF03910F).withOpacity(0.1),
                         child: Container(
@@ -195,8 +154,11 @@ class HomeScreen extends StatelessWidget {
                             ],
                           ),
                           child: InkWell(
-                            onTap: () {
-                              _selectDate(context);
+                            onTap: () async {
+                              await _selectDate(context);
+
+                              controller.onDateSelect(
+                                  data.title!, controller.selectedDate.value);
                             },
                             borderRadius: BorderRadius.circular(10),
                             child: Padding(
@@ -212,14 +174,8 @@ class HomeScreen extends StatelessWidget {
                                   const SizedBox(width: kSpacing / 2),
                                   Text(
                                     "Select Date : " +
-                                        controller.selectedDate.value.year
-                                            .toString() +
-                                        " - " +
-                                        controller.selectedDate.value.month
-                                            .toString() +
-                                        " - " +
-                                        controller.selectedDate.value.day
-                                            .toString(),
+                                        controller.getDateString(
+                                            controller.selectedDate.value),
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 25,
@@ -296,34 +252,52 @@ class HomeScreen extends StatelessWidget {
                                     child: Container(
                                       width: 300,
                                       height: 200,
-                                      child: PieChart(
-                                        PieChartData(
-                                          pieTouchData: PieTouchData(
-                                            touchCallback: (FlTouchEvent event,
-                                                pieTouchResponse) {
-                                              if (!event
-                                                      .isInterestedForInteractions ||
-                                                  pieTouchResponse == null ||
-                                                  pieTouchResponse
-                                                          .touchedSection ==
-                                                      null) {
-                                                controller.touchedIndexPie = -1;
-                                                return;
-                                              }
-                                              controller.touchedIndexPie =
-                                                  pieTouchResponse
-                                                      .touchedSection!
-                                                      .touchedSectionIndex;
-                                            },
-                                          ),
-                                          borderData: FlBorderData(
-                                            show: false,
-                                          ),
-                                          sectionsSpace: 5,
-                                          centerSpaceRadius: 50,
-                                          sections: showingSections(),
-                                        ),
-                                      ),
+                                      child: controller.totalItems == 0
+                                          ? Center(
+                                              child: Text(
+                                                "No electric item used on " +
+                                                    controller.getDateString(
+                                                        controller.selectedDate
+                                                            .value),
+                                                style: TextStyle(
+                                                  color: Colors.black38,
+                                                  fontSize: 25,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            )
+                                          : PieChart(
+                                              PieChartData(
+                                                pieTouchData: PieTouchData(
+                                                  touchCallback:
+                                                      (FlTouchEvent event,
+                                                          pieTouchResponse) {
+                                                    if (!event
+                                                            .isInterestedForInteractions ||
+                                                        pieTouchResponse ==
+                                                            null ||
+                                                        pieTouchResponse
+                                                                .touchedSection ==
+                                                            null) {
+                                                      controller
+                                                          .touchedIndexPie = -1;
+                                                      return;
+                                                    }
+                                                    controller.touchedIndexPie =
+                                                        pieTouchResponse
+                                                            .touchedSection!
+                                                            .touchedSectionIndex;
+                                                  },
+                                                ),
+                                                borderData: FlBorderData(
+                                                  show: false,
+                                                ),
+                                                sectionsSpace: 5,
+                                                centerSpaceRadius: 50,
+                                                sections: showingSections(),
+                                              ),
+                                            ),
                                     ),
                                   ),
                                   Align(
@@ -347,9 +321,11 @@ class HomeScreen extends StatelessWidget {
                                                   children: [
                                                     Indicator(
                                                       color: item["Color"],
-                                                      text: item["Device"] +
-                                                          ", " +
-                                                          item["Description"],
+                                                      text: item["Device"]
+                                                      // +
+                                                      //     ", " +
+                                                      //     item["Description"]
+                                                      ,
                                                       isSquare: false,
                                                       size: 16,
                                                     ),
